@@ -1,0 +1,4 @@
+paymentMethod,transactionCount,totalAmount,avgAmount
+"cash","205","878580","4286"
+"kaspi","186","860900","4628"
+"card","162","650940","4018"
