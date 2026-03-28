@@ -71,7 +71,7 @@ const seedData = async () => {
       {
         name: 'Hot Desk 1',
         type: 'hot_desk',
-        pricePerHour: 1500,
+        pricePerHour: 400,
         capacity: 1,
         description: 'Flexible hot desk in open coworking area',
         amenities: ['WiFi', 'Power outlet', 'Natural light'],
@@ -81,7 +81,7 @@ const seedData = async () => {
       {
         name: 'Hot Desk 2',
         type: 'hot_desk',
-        pricePerHour: 1500,
+        pricePerHour: 400,
         capacity: 1,
         description: 'Flexible hot desk with window view',
         amenities: ['WiFi', 'Power outlet', 'Window view'],
@@ -91,7 +91,7 @@ const seedData = async () => {
       {
         name: 'Dedicated Desk A1',
         type: 'desk',
-        pricePerHour: 2500,
+        pricePerHour: 500,
         capacity: 1,
         description: 'Your own dedicated workspace',
         amenities: ['WiFi', 'Lockable drawer', 'Monitor', 'Ergonomic chair'],
@@ -101,7 +101,7 @@ const seedData = async () => {
       {
         name: 'Dedicated Desk A2',
         type: 'desk',
-        pricePerHour: 2500,
+        pricePerHour: 500,
         capacity: 1,
         description: 'Dedicated desk in quiet zone',
         amenities: ['WiFi', 'Lockable drawer', 'Monitor', 'Quiet zone'],
@@ -111,7 +111,7 @@ const seedData = async () => {
       {
         name: 'Meeting Room Alpha',
         type: 'meeting_room',
-        pricePerHour: 5000,
+        pricePerHour: 1500,
         capacity: 8,
         description: 'Professional meeting room with AV equipment',
         amenities: ['WiFi', 'TV Screen', 'Whiteboard', 'Video conferencing'],
@@ -121,7 +121,7 @@ const seedData = async () => {
       {
         name: 'Meeting Room Beta',
         type: 'meeting_room',
-        pricePerHour: 4000,
+        pricePerHour: 1200,
         capacity: 6,
         description: 'Cozy meeting room for small groups',
         amenities: ['WiFi', 'Monitor', 'Whiteboard'],
@@ -131,7 +131,7 @@ const seedData = async () => {
       {
         name: 'Private Office 1',
         type: 'private_office',
-        pricePerHour: 8000,
+        pricePerHour: 2500,
         capacity: 4,
         description: 'Fully private office space',
         amenities: ['WiFi', 'Desks', 'Chairs', 'Storage', 'Door lock'],
@@ -141,7 +141,7 @@ const seedData = async () => {
       {
         name: 'Private Office 2',
         type: 'private_office',
-        pricePerHour: 10000,
+        pricePerHour: 3000,
         capacity: 6,
         description: 'Spacious private office with view',
         amenities: ['WiFi', 'Desks', 'Chairs', 'Storage', 'Window view', 'Meeting table'],
@@ -152,76 +152,118 @@ const seedData = async () => {
 
     console.log(`Created ${workspaces.length} workspaces`);
 
-    // Create some bookings
+    // Create diverse bookings for analytics
     console.log('Creating sample bookings...');
     const now = new Date();
     const bookings = [];
-
-    // Past bookings (completed)
-    for (let i = 1; i <= 10; i++) {
-      const startTime = new Date(now.getTime() - (i * 24 * 60 * 60 * 1000));
-      startTime.setHours(9, 0, 0, 0);
-      const endTime = new Date(startTime.getTime() + 4 * 60 * 60 * 1000); // 4 hours
+    
+    // Client users only (skip admin, moderator, employee)
+    const clientUsers = users.slice(3); // John and Jane
+    
+    // Helper function to create random booking
+    const createBooking = async (user, daysOffset, status, workspaceIndex, hours, startHour) => {
+      const startTime = new Date(now.getTime() + (daysOffset * 24 * 60 * 60 * 1000));
+      startTime.setHours(startHour, 0, 0, 0);
+      const endTime = new Date(startTime.getTime() + hours * 60 * 60 * 1000);
       
-      const workspace = workspaces[i % workspaces.length];
-      const user = users[3 + (i % 2)]; // Rotate between John (index 3) and Jane (index 4)
+      // Set createdAt to be a few days before startTime for past bookings
+      const createdAt = daysOffset < 0 
+        ? new Date(startTime.getTime() - (Math.floor(Math.random() * 3) + 1) * 24 * 60 * 60 * 1000)
+        : new Date(now.getTime() - Math.floor(Math.random() * 7) * 24 * 60 * 60 * 1000);
+      
+      const workspace = workspaces[workspaceIndex % workspaces.length];
       
       const booking = await Booking.create({
         user: user._id,
         workspace: workspace._id,
         startTime,
         endTime,
-        totalHours: 4,
-        totalPrice: workspace.pricePerHour * 4,
-        status: 'completed',
-        notes: `Booking ${i}`
+        totalHours: hours,
+        totalPrice: workspace.pricePerHour * hours,
+        status,
+        notes: status === 'completed' ? 'Completed session' : status === 'confirmed' ? 'Upcoming session' : 'Pending confirmation',
+        createdAt,
+        updatedAt: createdAt
       });
 
-      // Create corresponding transaction
+      // Create transaction
+      const transactionStatus = status === 'completed' || status === 'confirmed' ? 'success' : 'pending';
+      const paymentMethods = ['kaspi', 'card', 'cash'];
+      
       await Transaction.create({
         booking: booking._id,
         user: user._id,
         amount: booking.totalPrice,
-        paymentMethod: i % 2 === 0 ? 'kaspi' : 'card',
-        status: 'success',
-        processedAt: startTime,
-        transactionId: `TXN-${Date.now()}-${booking._id}`
+        paymentMethod: paymentMethods[Math.floor(Math.random() * paymentMethods.length)],
+        status: transactionStatus,
+        processedAt: transactionStatus === 'success' ? startTime : null,
+        transactionId: transactionStatus === 'success' ? `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}` : null,
+        createdAt,
+        updatedAt: createdAt
       });
 
       bookings.push(booking);
+    };
+
+    // Create bookings for last 60 days (completed)
+    console.log('Creating past bookings (last 60 days)...');
+    for (const user of clientUsers) {
+      // Each user gets 25-30 past bookings over 60 days
+      const numBookings = 25 + Math.floor(Math.random() * 6);
+      
+      for (let i = 0; i < numBookings; i++) {
+        const daysAgo = -Math.floor(Math.random() * 60) - 1; // -1 to -60 days
+        const workspaceIndex = Math.floor(Math.random() * workspaces.length);
+        const hours = [2, 3, 4, 5, 6, 8][Math.floor(Math.random() * 6)]; // Random hours
+        const startHour = 8 + Math.floor(Math.random() * 6); // 8am to 2pm
+        
+        await createBooking(user, daysAgo, 'completed', workspaceIndex, hours, startHour);
+      }
     }
 
-    // Future bookings (confirmed)
-    for (let i = 1; i <= 5; i++) {
-      const startTime = new Date(now.getTime() + (i * 24 * 60 * 60 * 1000));
-      startTime.setHours(10, 0, 0, 0);
-      const endTime = new Date(startTime.getTime() + 3 * 60 * 60 * 1000); // 3 hours
+    // Create some cancelled bookings
+    console.log('Creating cancelled bookings...');
+    for (const user of clientUsers) {
+      const numCancelled = 2 + Math.floor(Math.random() * 3); // 2-4 cancelled
       
-      const workspace = workspaces[i % workspaces.length];
-      const user = users[3 + (i % 2)]; // Rotate between John (index 3) and Jane (index 4)
+      for (let i = 0; i < numCancelled; i++) {
+        const daysAgo = -Math.floor(Math.random() * 30) - 1;
+        const workspaceIndex = Math.floor(Math.random() * workspaces.length);
+        const hours = [2, 3, 4][Math.floor(Math.random() * 3)];
+        const startHour = 9 + Math.floor(Math.random() * 5);
+        
+        await createBooking(user, daysAgo, 'cancelled', workspaceIndex, hours, startHour);
+      }
+    }
+
+    // Create future bookings (confirmed)
+    console.log('Creating future confirmed bookings...');
+    for (const user of clientUsers) {
+      const numFuture = 3 + Math.floor(Math.random() * 4); // 3-6 future bookings
       
-      const booking = await Booking.create({
-        user: user._id,
-        workspace: workspace._id,
-        startTime,
-        endTime,
-        totalHours: 3,
-        totalPrice: workspace.pricePerHour * 3,
-        status: 'confirmed',
-        notes: `Future booking ${i}`
-      });
+      for (let i = 0; i < numFuture; i++) {
+        const daysAhead = Math.floor(Math.random() * 30) + 1; // 1 to 30 days ahead
+        const workspaceIndex = Math.floor(Math.random() * workspaces.length);
+        const hours = [3, 4, 5, 6, 8][Math.floor(Math.random() * 5)];
+        const startHour = 9 + Math.floor(Math.random() * 4);
+        
+        await createBooking(user, daysAhead, 'confirmed', workspaceIndex, hours, startHour);
+      }
+    }
 
-      await Transaction.create({
-        booking: booking._id,
-        user: user._id,
-        amount: booking.totalPrice,
-        paymentMethod: 'kaspi',
-        status: 'success',
-        processedAt: now,
-        transactionId: `TXN-${Date.now()}-${booking._id}`
-      });
-
-      bookings.push(booking);
+    // Create pending bookings (awaiting confirmation)
+    console.log('Creating pending bookings...');
+    for (const user of clientUsers) {
+      const numPending = 1 + Math.floor(Math.random() * 3); // 1-3 pending
+      
+      for (let i = 0; i < numPending; i++) {
+        const daysAhead = Math.floor(Math.random() * 14) + 1; // 1 to 14 days ahead
+        const workspaceIndex = Math.floor(Math.random() * workspaces.length);
+        const hours = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
+        const startHour = 10 + Math.floor(Math.random() * 4);
+        
+        await createBooking(user, daysAhead, 'pending', workspaceIndex, hours, startHour);
+      }
     }
 
     console.log(`Created ${bookings.length} bookings with transactions`);

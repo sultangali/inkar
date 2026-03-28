@@ -117,11 +117,11 @@ export const DashboardAnalytics = () => {
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={workspaceData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
+                  <XAxis dataKey="workspaceName" />
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="bookings" fill="#2196f3" />
+                  <Bar dataKey="bookingCount" fill="#2196f3" />
                 </BarChart>
               </ResponsiveContainer>
             </CardBody>
@@ -138,7 +138,7 @@ export const DashboardAnalytics = () => {
                   <PieChart>
                     <Pie
                       data={revenueByType}
-                      dataKey="revenue"
+                      dataKey="totalRevenue"
                       nameKey="type"
                       cx="50%"
                       cy="50%"
@@ -167,7 +167,7 @@ export const DashboardAnalytics = () => {
                     <Pie
                       data={paymentMethods}
                       dataKey="count"
-                      nameKey="method"
+                      nameKey="paymentMethod"
                       cx="50%"
                       cy="50%"
                       outerRadius={100}
@@ -198,7 +198,7 @@ export const DashboardAnalytics = () => {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Line type="monotone" dataKey="bookings" stroke="#2196f3" strokeWidth={2} />
+                  <Line type="monotone" dataKey="total" stroke="#2196f3" strokeWidth={2} />
                 </LineChart>
               </ResponsiveContainer>
             </CardBody>
