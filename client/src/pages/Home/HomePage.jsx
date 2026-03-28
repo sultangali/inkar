@@ -55,14 +55,14 @@ export const HomePage = () => {
     {
       type: 'hot_desk',
       icon: Coffee,
-      price: '300',
+      price: '480',
       color: 'from-orange-400 to-orange-600',
       features: ['WiFi', t('home.pricing.flexible'), t('home.pricing.commonArea'), t('home.pricing.coffeeIncluded')]
     },
     {
       type: 'desk',
       icon: Monitor,
-      price: '500',
+      price: '480',
       color: 'from-blue-400 to-blue-600',
       popular: true,
       features: ['WiFi', t('home.pricing.personalDesk'), t('home.pricing.monitor'), t('home.pricing.locker'), t('home.pricing.coffeeIncluded')]
@@ -70,14 +70,14 @@ export const HomePage = () => {
     {
       type: 'meeting_room',
       icon: Users,
-      price: '680',
+      price: '1200',
       color: 'from-purple-400 to-purple-600',
       features: ['WiFi', t('home.pricing.projector'), t('home.pricing.whiteboard'), t('home.pricing.upTo10'), t('home.pricing.coffeeIncluded')]
     },
     {
       type: 'private_office',
       icon: Building2,
-      price: '920',
+      price: '2500',
       color: 'from-emerald-400 to-emerald-600',
       features: ['WiFi', t('home.pricing.privateRoom'), t('home.pricing.furniture'), t('home.pricing.storage'), t('home.pricing.priority')]
     }

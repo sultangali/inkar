@@ -71,7 +71,7 @@ const seedData = async () => {
       {
         name: 'Hot Desk 1',
         type: 'hot_desk',
-        pricePerHour: 400,
+        pricePerHour: 480,
         capacity: 1,
         description: 'Flexible hot desk in open coworking area',
         amenities: ['WiFi', 'Power outlet', 'Natural light'],
@@ -81,7 +81,7 @@ const seedData = async () => {
       {
         name: 'Hot Desk 2',
         type: 'hot_desk',
-        pricePerHour: 400,
+        pricePerHour: 480,
         capacity: 1,
         description: 'Flexible hot desk with window view',
         amenities: ['WiFi', 'Power outlet', 'Window view'],
@@ -91,7 +91,7 @@ const seedData = async () => {
       {
         name: 'Dedicated Desk A1',
         type: 'desk',
-        pricePerHour: 500,
+        pricePerHour: 480,
         capacity: 1,
         description: 'Your own dedicated workspace',
         amenities: ['WiFi', 'Lockable drawer', 'Monitor', 'Ergonomic chair'],
@@ -101,7 +101,7 @@ const seedData = async () => {
       {
         name: 'Dedicated Desk A2',
         type: 'desk',
-        pricePerHour: 500,
+        pricePerHour: 480,
         capacity: 1,
         description: 'Dedicated desk in quiet zone',
         amenities: ['WiFi', 'Lockable drawer', 'Monitor', 'Quiet zone'],

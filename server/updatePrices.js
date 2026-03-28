@@ -14,16 +14,16 @@ const updatePrices = async () => {
     // Update hot desks
     await Workspace.updateMany(
       { type: 'hot_desk' },
-      { $set: { pricePerHour: 400 } }
+      { $set: { pricePerHour: 480 } }
     );
-    console.log('✓ Updated hot desk prices to 400₸/hour');
+    console.log('✓ Updated hot desk prices to 480₸/hour');
 
     // Update dedicated desks
     await Workspace.updateMany(
       { type: 'desk' },
-      { $set: { pricePerHour: 500 } }
+      { $set: { pricePerHour: 480 } }
     );
-    console.log('✓ Updated dedicated desk prices to 500₸/hour');
+    console.log('✓ Updated dedicated desk prices to 480₸/hour');
 
     // Update meeting rooms
     const meetingRooms = await Workspace.find({ type: 'meeting_room' });
@@ -45,8 +45,8 @@ const updatePrices = async () => {
 
     console.log('\n✅ All prices updated successfully!');
     console.log('\nNew pricing structure:');
-    console.log('- Hot desk: 400₸/hour (~3,200₸/day, ~70,400₸/month)');
-    console.log('- Dedicated desk: 500₸/hour (~4,000₸/day, ~88,000₸/month)');
+    console.log('- Hot desk: 480₸/hour (~3,840₸/day, ~84,480₸/month)');
+    console.log('- Dedicated desk: 480₸/hour (~3,840₸/day, ~84,480₸/month)');
     console.log('- Meeting room: 1200-1500₸/hour');
     console.log('- Private office: 2500-3000₸/hour');
 
